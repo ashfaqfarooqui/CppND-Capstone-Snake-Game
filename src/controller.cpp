@@ -35,20 +35,20 @@ void Controller::HandleInput(bool &running, Snake &snake1,
         ChangeDirection(snake1, Snake::Direction::kRight,
                         Snake::Direction::kLeft);
         break;
-      case SDLK_2:
+      case SDLK_w:
         ChangeDirection(snake2, Snake::Direction::kUp, Snake::Direction::kDown);
         break;
 
-      case SDLK_3:
+      case SDLK_s:
         ChangeDirection(snake2, Snake::Direction::kDown, Snake::Direction::kUp);
         break;
 
-      case SDLK_1:
+      case SDLK_a:
         ChangeDirection(snake2, Snake::Direction::kLeft,
                         Snake::Direction::kRight);
         break;
 
-      case SDLK_4:
+      case SDLK_d:
         ChangeDirection(snake2, Snake::Direction::kRight,
                         Snake::Direction::kLeft);
         break;

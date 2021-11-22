@@ -44,16 +44,24 @@ This work is licensed under a
 3. Score made by the user is tracked and stored in a file.
 4. If there is a new highest this is reported to the user.
 5. Before termination the top 5 scores are displayed out.
-
+6. The game has been modified to accommodate two players
+7. Player 2 plays with the following keys: 
+   w- Up
+   a- Down
+   s- Left
+   d- Right
+   
+   
 # File structure
 The following is a helicopter view of the different classes:
 
-- Controller -- Handles user input while playing the game
-- Game --  the main class the initializes the Snake object and executes the game steps
+- Controller -- Handles user input while playing the game for both players
+- Game --  the main class the initializes the Snake object and executes the game steps, places food and checks if there is a collision between the two snakes. 
 - Renderer --  responsible for displaying and UI for the game
 - Player --  Holds information about the player and corresponding score
 - Score -- this class handles reading the previous scores and checks if a new highest is made. It also stores the scores into the scores.txt file.
 
 # Specifications met
 1. All three points related to "Loops, Functions, I/O"
-2. First three points of OOP.
+2. First five points of OOP.
+3. First point in memory Management
