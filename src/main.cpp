@@ -14,24 +14,38 @@ int main() {
 
   Renderer renderer(kScreenWidth, kScreenHeight, kGridWidth, kGridHeight);
   Controller controller;
-  std::string playerName;
-  std::cout << "enter player name: ";
-  std::cin >> playerName;
-  Player p(playerName, 0);
+  std::string playerName1;
+  std::string playerName2;
+  std::cout << "enter player1 name: ";
+  std::cin >> playerName1;
+  std::cout << "enter player2 name: ";
+  std::cin >> playerName2;
+  std::cout << "\n\n ";
+  Player p1(playerName1, 0);
+
+  Player p2(playerName2, 0);
   Score score;
   while (true) {
-    Game game(kGridWidth, kGridHeight);
+    Game game(kGridWidth, kGridHeight, &p1, &p2);
+
     game.Run(controller, renderer, kMsPerFrame);
-    p.setScore(game.GetScore());
-    std::cout << p.getName() << "Score: " << p.getScore() << "\n";
-    std::cout << "Size: " << game.GetSize() << "\n";
+    //    p.setScore(game.GetScore());
+    std::cout << p1.getName() << "   "
+              << "Score: " << p1.getScore() << "\n";
+    std::cout << p2.getName() << "   "
+              << "Score: " << p2.getScore() << "\n";
+
+    if (score.isNewHighest(p1.getScore()) && p1.getScore() > p2.getScore()) {
+      std::cout << "new highest for player 1!\n";
+    }
+    if (score.isNewHighest(p2.getScore()) && p2.getScore() > p1.getScore()) {
+      std::cout << "new highest for player 2!\n";
+    }
+    score.addPlayerScore(p1);
+    score.addPlayerScore(p2);
+    std::string s;
     std::cout << "do you want to play again? (y/N)?"
               << "\n";
-    if (score.isNewHighest(p.getScore())) {
-      std::cout << "new highest!\n";
-    }
-    score.addPlayerScore(p);
-    std::string s;
     std::cin >> s;
     if (s == "n")
       break;

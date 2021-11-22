@@ -11,6 +11,7 @@ public:
   int getScore();
   void setScore(int s);
   void incrementScore();
+  std::string getString();
 
 private:
   std::string name;

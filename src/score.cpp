@@ -23,6 +23,7 @@ void Score::printTopFive() {
     top = _players.size();
   }
   sortPlayers();
+
   for (int i = 0; i < top; i++) {
     std::cout << _players[i].getName() << " " << _players[i].getScore() << "\n";
   }
@@ -55,9 +56,17 @@ void Score::printHighest() {
 void Score::writeToFile() {
   std::ofstream out_file;
   out_file.open("score.txt");
-  for (auto p : _players) {
+  int top;
+  if (_players.size() > 5) {
+    top = 5;
+  } else {
+    top = _players.size();
+  }
+  sortPlayers();
 
-    out_file << p.getName() << " " << p.getScore() << "\n";
+  for (int i = 0; i < top; i++) {
+
+    out_file << _players[i].getName() << " " << _players[i].getScore() << "\n";
   }
 }
 

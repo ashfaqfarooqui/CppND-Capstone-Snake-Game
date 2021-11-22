@@ -5,10 +5,8 @@
 Renderer::Renderer(const std::size_t screen_width,
                    const std::size_t screen_height,
                    const std::size_t grid_width, const std::size_t grid_height)
-    : screen_width(screen_width),
-      screen_height(screen_height),
-      grid_width(grid_width),
-      grid_height(grid_height) {
+    : screen_width(screen_width), screen_height(screen_height),
+      grid_width(grid_width), grid_height(grid_height) {
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     std::cerr << "SDL could not initialize.\n";
@@ -38,7 +36,8 @@ Renderer::~Renderer() {
   SDL_Quit();
 }
 
-void Renderer::Render(Snake const snake, SDL_Point const &food) {
+void Renderer::Render(Snake const snake1, SDL_Point const &food,
+                      Snake const snake2) {
   SDL_Rect block;
   block.w = screen_width / grid_width;
   block.h = screen_height / grid_height;
@@ -53,8 +52,18 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
   block.y = food.y * block.h;
   SDL_RenderFillRect(sdl_renderer, &block);
 
+  renderSnake(snake1, 0xFF, 0xFF, 0xFF, 0xFF, block);
+  renderSnake(snake2, 0x0F, 0x0F, 0x0F, 0x0F, block);
+  // Update Screen
+  //
+  SDL_RenderPresent(sdl_renderer);
+}
+
+void Renderer::renderSnake(Snake const snake, uint8_t r, uint8_t g, uint8_t b,
+                           uint8_t d, SDL_Rect &block) {
+
   // Render snake's body
-  SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+  SDL_SetRenderDrawColor(sdl_renderer, r, g, b, d);
   for (SDL_Point const &point : snake.body) {
     block.x = point.x * block.w;
     block.y = point.y * block.h;
@@ -70,12 +79,9 @@ void Renderer::Render(Snake const snake, SDL_Point const &food) {
     SDL_SetRenderDrawColor(sdl_renderer, 0xFF, 0x00, 0x00, 0xFF);
   }
   SDL_RenderFillRect(sdl_renderer, &block);
-
-  // Update Screen
-  SDL_RenderPresent(sdl_renderer);
 }
 
-void Renderer::UpdateWindowTitle(int score, int fps) {
-  std::string title{"Snake Score: " + std::to_string(score) + " FPS: " + std::to_string(fps)};
+void Renderer::UpdateWindowTitle(std::string s1, std::string s2, int fps) {
+  std::string title{s1 + " " + s2 + " FPS: " + std::to_string(fps)};
   SDL_SetWindowTitle(sdl_window, title.c_str());
 }

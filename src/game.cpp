@@ -1,10 +1,12 @@
 #include "game.h"
-#include <iostream>
 #include "SDL.h"
+#include <chrono>
+#include <iostream>
 
-Game::Game(std::size_t grid_width, std::size_t grid_height)
-    : snake(grid_width, grid_height),
-      engine(dev()),
+Game::Game(std::size_t grid_width, std::size_t grid_height, Player *p1,
+           Player *p2)
+    : snake1(grid_width, grid_height, 3, 3),
+      snake2(grid_width, grid_height, 6, 6), p1(p1), p2(p2), engine(dev()),
       random_w(0, static_cast<int>(grid_width - 1)),
       random_h(0, static_cast<int>(grid_height - 1)) {
   PlaceFood();
@@ -23,9 +25,9 @@ void Game::Run(Controller const &controller, Renderer &renderer,
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
-    controller.HandleInput(running, snake);
-    Update();
-    renderer.Render(snake, food);
+    controller.HandleInput(running, snake1, snake2);
+    running = Update();
+    renderer.Render(snake1, food, snake2);
 
     frame_end = SDL_GetTicks();
 
@@ -36,7 +38,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      renderer.UpdateWindowTitle(p1->getString(), p2->getString(), frame_count);
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -52,12 +54,13 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
 void Game::PlaceFood() {
   int x, y;
+
   while (true) {
     x = random_w(engine);
     y = random_h(engine);
     // Check that the location is not occupied by a snake item before placing
     // food.
-    if (!snake.SnakeCell(x, y)) {
+    if (!snake1.SnakeCell(x, y) && !snake2.SnakeCell(x, y)) {
       food.x = x;
       food.y = y;
       return;
@@ -65,23 +68,55 @@ void Game::PlaceFood() {
   }
 }
 
-void Game::Update() {
-  if (!snake.alive) return;
+int Game::Update() {
 
-  snake.Update();
+  checkIfSnakesCrash();
+  if (!snake1.alive || !snake2.alive) {
+    return false;
+  } else {
+    snake1.Update();
 
-  int new_x = static_cast<int>(snake.head_x);
-  int new_y = static_cast<int>(snake.head_y);
+    snake2.Update();
 
-  // Check if there's food over here
-  if (food.x == new_x && food.y == new_y) {
-    score++;
-    PlaceFood();
-    // Grow snake and increase speed.
-    snake.GrowBody();
-    snake.speed += 0.02;
+    // Check if there's food over here
+    checkIfFoodConsumed(&snake1, p1);
+
+    checkIfFoodConsumed(&snake2, p2);
+    return true;
   }
 }
+void Game::checkIfSnakesCrash() {
+  if (static_cast<int>(snake1.head_x) == static_cast<int>(snake2.head_x) &&
+      static_cast<int>(snake1.head_y) == static_cast<int>(snake2.head_y)) {
 
+    std::cout << "Snake 1 dead, snake 2 dead\n";
+    snake1.alive = false;
+    snake2.alive = false;
+    return;
+  }
+  if (snake1.SnakeCell(snake2.head_x, snake2.head_y)) {
+
+    snake2.alive = false;
+  }
+  if (snake2.SnakeCell(snake1.head_x, snake1.head_y)) {
+
+    snake1.alive = false;
+  }
+}
+void Game::checkIfFoodConsumed(Snake *s, Player *p) {
+
+  int new1_x = static_cast<int>(s->head_x);
+  int new1_y = static_cast<int>(s->head_y);
+
+  if (food.x == new1_x && food.y == new1_y) {
+    p->incrementScore();
+
+    // score++;
+    PlaceFood();
+    // Grow snake and increase speed.
+    s->GrowBody();
+    s->speed += 0.02;
+  }
+}
 int Game::GetScore() const { return score; }
-int Game::GetSize() const { return snake.size; }
+int Game::GetSize() const { return snake1.size; }
